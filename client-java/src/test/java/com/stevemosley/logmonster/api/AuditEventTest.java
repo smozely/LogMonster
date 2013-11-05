@@ -27,27 +27,31 @@ public class AuditEventTest {
     @After
     public void cleanup() {
         DateTimeUtils.clearFixedDate();
-        ContextIdProvider.clearCurrentContextId();
-        MappedDiagnosticContextProvider.pop("AUDIT KEY");
     }
 
     @Test
     public void testConstruction() {
 
-        // GIVEN
-        DateTimeUtils.setCurrentDateFixed("2000-01-01T00:00:00");
-        ContextIdProvider.setCurrentContextId("IDENTIFIER");
-        MappedDiagnosticContextProvider.push("AUDIT KEY", "VAL");
 
-        // WHEN
-        AuditEvent result = new AuditEvent("AUDIT ID");
+        try {
+            // GIVEN
+            DateTimeUtils.setCurrentDateFixed("2000-01-01T00:00:00");
+            ContextIdProvider.setCurrentContextId("IDENTIFIER");
+            MappedDiagnosticContextProvider.push("AUDIT KEY", "VAL");
 
-        // THEN
-        assertThat(result.getDate(), is(new DateTime("2000-01-01T00:00:00")));
-        assertThat(result.getSystem(), is("SYSTEM ID"));
-        assertThat(result.getContextIdentifier(), is("IDENTIFIER"));
-        assertThat(result.getMappedDiagnosticContext(), is((Map) ImmutableMap.of("AUDIT KEY", "VAL")));
-        assertThat(result.getAuditIdentifier(), is("AUDIT ID"));
+            // WHEN
+            AuditEvent result = new AuditEvent("AUDIT ID");
+
+            // THEN
+            assertThat(result.getDate(), is(new DateTime("2000-01-01T00:00:00")));
+            assertThat(result.getSystem(), is("SYSTEM ID"));
+            assertThat(result.getContextIdentifier(), is("IDENTIFIER"));
+            assertThat(result.getMappedDiagnosticContext(), is((Map) ImmutableMap.of("AUDIT KEY", "VAL")));
+            assertThat(result.getAuditIdentifier(), is("AUDIT ID"));
+        } finally {
+            ContextIdProvider.clearCurrentContextId();
+            MappedDiagnosticContextProvider.pop("AUDIT KEY");
+        }
     }
 
 }
